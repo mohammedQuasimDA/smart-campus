@@ -8,6 +8,8 @@ import com.sc.smartcampus.repository.StudentRepository;
 import com.sc.smartcampus.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.sc.smartcampus.exception.DuplicateRollNumberException;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -56,8 +58,13 @@ public class StudentServiceImpl implements StudentService {
         student.setDepartment(department);
         student.setEnrollmentDate(dto.getEnrollmentDate());
 
-        // 5. Save student entity
-        student = studentRepository.save(student);
+        try {
+            // 5. Save student entity
+            student = studentRepository.save(student);
+        } catch (DataIntegrityViolationException e) {
+            // 6. Throw a custom exception if rollNumber or email is duplicated
+            throw new DuplicateRollNumberException("Student with roll number " + nextRollNumber + " or email already exists.");
+        }
 
         // 6. Convert to response DTO and return
         return mapToResponseDTO(student);

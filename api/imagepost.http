@@ -1,0 +1,9 @@
+POST http://localhost:9090/api/images/student/23CS001/upload
+Content-Type: multipart/form-data; boundary=Boundary123
+
+--Boundary123
+Content-Disposition: form-data; name="file"; filename="profile.jpg"
+Content-Type: image/png
+
+< Z:/profile/profile.png
+--Boundary123--

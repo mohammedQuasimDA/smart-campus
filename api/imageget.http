@@ -1,0 +1,2 @@
+GET http://localhost:9090/api/images/student/23CS001
+Accept: image/jpeg
