@@ -1,0 +1,9 @@
+PUT http://localhost:9090/api/students/23CS001
+Content-Type: application/json
+
+{
+"name": "John Doe Updated",
+"email": "john.updated@example.com",
+"department": "ME",
+"enrollmentDate": "2023-08-20"
+}
