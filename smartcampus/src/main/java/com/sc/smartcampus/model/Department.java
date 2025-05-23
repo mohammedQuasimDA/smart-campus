@@ -1,5 +1,7 @@
 package com.sc.smartcampus.model;
 
+import com.sc.smartcampus.exception.InvalidDepartmentCodeException;
+
 public enum Department {
     // Core Engineering
     AEROSPACE("AE", "Aerospace Engineering"),
@@ -53,7 +55,8 @@ public enum Department {
                 return dept;
             }
         }
-        throw new IllegalArgumentException("Invalid department code: " + code);
+
+        throw new InvalidDepartmentCodeException(code);
     }
 
 }
