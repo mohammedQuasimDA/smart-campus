@@ -31,13 +31,19 @@ public class Student {
     @NotNull(message = "Enrollment date is required")
     private LocalDate enrollmentDate;
 
+    @Column(name = "profile_image_id")
+    private String profileImageId;
+
+
     public Student(String rollNumber, String name, String email, Department department, LocalDate enrollmentDate) {
         this.rollNumber = rollNumber;
         this.name = name;
         this.email = email;
         this.department = department;
         this.enrollmentDate = enrollmentDate;
+        this.profileImageId = null;  // no image yet
     }
+
 
 
     public Student() {
@@ -83,6 +89,16 @@ public class Student {
     public void setEnrollmentDate(LocalDate enrollmentDate) {
         this.enrollmentDate = enrollmentDate;
     }
+
+    public String getProfileImageId() {
+        return profileImageId;
+    }
+
+    public void setProfileImageId(String profileImageId) {
+        this.profileImageId = profileImageId;
+    }
+
+
 }
 
 

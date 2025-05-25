@@ -2,20 +2,31 @@ package com.sc.smartcampus.controller;
 
 import com.sc.smartcampus.dto.StudentRequestDTO;
 import com.sc.smartcampus.dto.StudentResponseDTO;
+import com.sc.smartcampus.repository.StudentRepository;
 import com.sc.smartcampus.service.StudentService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/students")
 public class StudentController {
 
-    @Autowired
+
     private StudentService studentService;
+    private StudentRepository studentRepository;
+
+    public StudentController(StudentService studentService,  StudentRepository studentRepository) {
+        this.studentService = studentService;
+        this.studentRepository = studentRepository;
+
+    }
 
     // 1. Create Student
     @PostMapping
@@ -59,4 +70,10 @@ public class StudentController {
         List<StudentResponseDTO> results = studentService.searchStudents(keyword);
         return ResponseEntity.ok(results);
     }
+
+
+
+
+
+
 }

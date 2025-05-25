@@ -1,9 +1,9 @@
-POST http://localhost:9090/api/students
+POST http://localhost:4000/api/students
 Content-Type: application/json
 
 {
-  "name": "Joqsadhn a Doe",
-  "email": "joewqqhn.wdose@example.com",
+  "name": "kaka",
+  "email": "kaka@example.com",
   "department": "CS",
   "enrollmentDate": "2023-08-15"
 }
