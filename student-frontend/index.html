@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        #result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+<h1>Add Student</h1>
+<form id="studentForm">
+    <input type="text" id="name" placeholder="Name" required><br>
+    <input type="email" id="email" placeholder="Email" required><br>
+
+    <!-- Department dropdown -->
+    <select id="department" required>
+        <option value="" disabled selected>Select Department</option>
+        <option value="AE">Aerospace Engineering</option>
+        <option value="AU">Automobile Engineering</option>
+        <option value="BT">Biotechnology</option>
+        <option value="CH">Chemical Engineering</option>
+        <option value="CE">Civil Engineering</option>
+        <option value="CS">Computer Science</option>
+        <option value="CSE">Computer Science Engineering</option>
+        <option value="EE">Electrical Engineering</option>
+        <option value="EC">Electronics Engineering</option>
+        <option value="ECE">Electronics and Communication</option>
+        <option value="EN">Environmental Engineering</option>
+        <option value="IE">Industrial Engineering</option>
+        <option value="IT">Information Technology</option>
+        <option value="IC">Instrumentation and Control</option>
+        <option value="ME">Mechanical Engineering</option>
+        <option value="MT">Mechatronics</option>
+        <option value="ML">Metallurgical Engineering</option>
+        <option value="MN">Mining Engineering</option>
+        <option value="PE">Petroleum Engineering</option>
+        <option value="PD">Production Engineering</option>
+        <option value="RB">Robotics Engineering</option>
+        <option value="TE">Textile Engineering</option>
+        <option value="AI">Artificial Intelligence</option>
+        <option value="DS">Data Science</option>
+        <option value="CY">Cyber Security</option>
+        <option value="CC">Cloud Computing</option>
+        <option value="IO">Internet of Things</option>
+    </select><br>
+
+    <input type="date" id="enrollmentDate" placeholder="Enrollment Date" required><br>
+    <input type="file" id="profilePic" accept="image/*" required><br>
+
+    <button type="submit">Add Student</button>
+</form>
+
+
+<div id="result"></div>
+
+<hr>
+
+<h2>All Students</h2>
+<button id="loadStudentsBtn">See All Students</button>
+
+<table id="studentsTable" style="display:none;">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Roll Number</th>
+        <th>Email</th>
+        <th>Department</th>
+    </tr>
+    </thead>
+    <tbody id="studentsTableBody"></tbody>
+</table>
+
+<hr>
+<h2>Student Operations</h2>
+
+<!-- Get Student by Roll No -->
+<h3>Get Student by Roll Number</h3>
+<input type="text" id="getRollNo" placeholder="Enter Roll Number">
+<button onclick="getStudentByRoll()">Get Student</button>
+<div id="getResult"></div>
+
+<!-- Delete Student by Roll No -->
+<h3>Delete Student by Roll Number</h3>
+<input type="text" id="deleteRollNo" placeholder="Enter Roll Number">
+<button onclick="deleteStudentByRoll()">Delete Student</button>
+<div id="deleteResult"></div>
+
+<!-- Search by Keyword -->
+<h3>Search Students</h3>
+<input type="text" id="searchKeyword" placeholder="Enter Name or Email">
+<button onclick="searchStudents()">Search</button>
+<table id="searchTable" style="display:none;">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Roll Number</th>
+        <th>Email</th>
+        <th>Department</th>
+    </tr>
+    </thead>
+    <tbody id="searchTableBody"></tbody>
+</table>
+
+<!-- Update Student -->
+<h3>Update Student by Roll Number</h3>
+<input type="text" id="updateRollNo" placeholder="Enter Roll Number"><br>
+<input type="text" id="updateName" placeholder="New Name"><br>
+<input type="email" id="updateEmail" placeholder="New Email"><br>
+<select id="updateDepartment">
+    <option value="" disabled selected>Select New Department</option>
+    <option value="AE">Aerospace Engineering</option>
+    <option value="AU">Automobile Engineering</option>
+    <option value="BT">Biotechnology</option>
+    <option value="CH">Chemical Engineering</option>
+    <option value="CE">Civil Engineering</option>
+    <option value="CS">Computer Science</option>
+    <option value="CSE">Computer Science Engineering</option>
+    <option value="EE">Electrical Engineering</option>
+    <option value="EC">Electronics Engineering</option>
+    <option value="ECE">Electronics and Communication</option>
+    <option value="EN">Environmental Engineering</option>
+    <option value="IE">Industrial Engineering</option>
+    <option value="IT">Information Technology</option>
+    <option value="IC">Instrumentation and Control</option>
+    <option value="ME">Mechanical Engineering</option>
+    <option value="MT">Mechatronics</option>
+    <option value="ML">Metallurgical Engineering</option>
+    <option value="MN">Mining Engineering</option>
+    <option value="PE">Petroleum Engineering</option>
+    <option value="PD">Production Engineering</option>
+    <option value="RB">Robotics Engineering</option>
+    <option value="TE">Textile Engineering</option>
+    <option value="AI">Artificial Intelligence</option>
+    <option value="DS">Data Science</option>
+    <option value="CY">Cyber Security</option>
+    <option value="CC">Cloud Computing</option>
+    <option value="IO">Internet of Things</option>
+</select><br>
+<input type="date" id="updateEnrollmentDate"><br>
+<button onclick="updateStudent()">Update Student</button>
+<div id="updateResult"></div>
+
+
+<script>
+    const BASE_URL = 'http://localhost:4000/api/students';
+
+    // Handle form submission
+    document.getElementById('studentForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const department = document.getElementById('department').value;
+        const enrollmentDate = document.getElementById('enrollmentDate').value;
+        const profilePic = document.getElementById('profilePic').files[0];
+
+        const payload = { name, email, department, enrollmentDate };
+
+        try {
+            // Step 1: Create Student
+            const response = await fetch(BASE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add student');
+            }
+
+            const result = await response.json();
+            const rollNumber = result.rollNumber;
+
+            // Step 2: Upload Image using FormData
+            const formData = new FormData();
+            formData.append('file', profilePic);
+
+            const imageResponse = await fetch(`${BASE_URL}/upload/${rollNumber}/upload-image`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!imageResponse.ok) {
+                throw new Error('Student created, but image upload failed');
+            }
+
+            document.getElementById('result').innerText = `Student added successfully! Roll No: ${rollNumber}`;
+            document.getElementById('studentForm').reset();
+            loadStudents();
+
+        } catch (error) {
+            document.getElementById('result').innerText = error.message;
+        }
+    });
+
+
+    // Load all students and display in table
+    async function loadStudents() {
+        try {
+            const response = await fetch(BASE_URL);
+            if (!response.ok) throw new Error('Failed to fetch students');
+
+            const students = await response.json();
+
+            const tbody = document.getElementById('studentsTableBody');
+            tbody.innerHTML = '';
+
+            students.forEach(student => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                <td>${student.name}</td>
+                <td>${student.rollNumber}</td>
+                <td>${student.email}</td>
+                <td>${student.department}</td>
+                <td><img src="${BASE_URL}/upload/${student.rollNumber}/image" alt="Profile" width="50" height="50" onerror="this.onerror=null;this.src='placeholder.jpg';"/></td>
+            `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('studentsTable').style.display = students.length ? 'table' : 'none';
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    // Get student by roll number
+    async function getStudentByRoll() {
+        const rollNo = document.getElementById('getRollNo').value;
+        try {
+            const res = await fetch(`${BASE_URL}/${rollNo}`);
+            if (!res.ok) throw new Error("Student not found");
+            const student = await res.json();
+            document.getElementById('getResult').innerText =
+                `Found: ${student.name}, ${student.email}, ${student.department}`;
+        } catch (e) {
+            document.getElementById('getResult').innerText = e.message;
+        }
+    }
+
+    // Delete student by roll number
+    async function deleteStudentByRoll() {
+        const rollNo = document.getElementById('deleteRollNo').value;
+        try {
+            const res = await fetch(`${BASE_URL}/${rollNo}`, {
+                method: 'DELETE'
+            });
+            if (!res.ok) throw new Error("Failed to delete student");
+            document.getElementById('deleteResult').innerText = `Student with Roll No ${rollNo} deleted.`;
+            loadStudents(); // Refresh list
+        } catch (e) {
+            document.getElementById('deleteResult').innerText = e.message;
+        }
+    }
+
+    // Search students by keyword
+    async function searchStudents() {
+        const keyword = document.getElementById('searchKeyword').value;
+        try {
+            const res = await fetch(`${BASE_URL}/search?keyword=${encodeURIComponent(keyword)}`);
+            if (!res.ok) throw new Error("Search failed");
+            const students = await res.json();
+
+            const tbody = document.getElementById('searchTableBody');
+            tbody.innerHTML = '';
+            students.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                <td>${s.name}</td>
+                <td>${s.rollNumber}</td>
+                <td>${s.email}</td>
+                <td>${s.department}</td>
+            `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('searchTable').style.display = students.length ? 'table' : 'none';
+        } catch (e) {
+            alert(e.message);
+        }
+    }
+
+    // Update student by roll number
+    async function updateStudent() {
+        const rollNo = document.getElementById('updateRollNo').value;
+        const name = document.getElementById('updateName').value;
+        const email = document.getElementById('updateEmail').value;
+        const department = document.getElementById('updateDepartment').value;
+        const enrollmentDate = document.getElementById('updateEnrollmentDate').value;
+
+        const payload = { name, email, department, enrollmentDate };
+
+        try {
+            const res = await fetch(`${BASE_URL}/${rollNo}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error("Failed to update student");
+            document.getElementById('updateResult').innerText = `Student ${rollNo} updated successfully.`;
+            loadStudents();
+        } catch (e) {
+            document.getElementById('updateResult').innerText = e.message;
+        }
+    }
+
+
+    // Button event listener
+    document.getElementById('loadStudentsBtn').addEventListener('click', loadStudents);
+</script>
+</body>
+</html>
